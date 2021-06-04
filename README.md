@@ -1,38 +1,84 @@
-Role Name
-=========
+# Ansible-MultipleOS-LAMP
 
-A brief description of the role goes here.
+## Description:
 
-Requirements
-------------
+A simple ansible role to setup LAMP server on muliple [Linux Distributions](https://en.wikipedia.org/wiki/List_of_Linux_distributions). This role can be use to setup LAMP on [Amazon Linux](https://aws.amazon.com/amazon-linux-ami/), [Red Hat Linux](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux), [Centos](https://www.centos.org/) and [Ubuntu](https://ubuntu.com/). This role installs all necessary packages, Apache/Apache2, PHP 7.4, Mariadb/MySQL server and also completes MySQL secure installation. This role also enables Apache virtual hosts and you can make this role custom with variables defined for this role. The variables used are given below.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Role Variables
 
-Role Variables
---------------
+The variables used in this role are given below. You can edit the roles on file /vars/main.yml ,
+```
+domain_name: "markdevops.xyz"
+httpd_group: "apache"
+httpd_user: "apache"
+ubuntu_user: "www-data"
+ubuntu_group: "www-data"
+httpd_port: "80"
+mysql_root: "myroot123"
+```
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## How to use?
 
-Dependencies
-------------
+I have added this role to [Ansible Galaxy](https://galaxy.ansible.com/) and you can use it to install this role on your Ansible Server. Ansible Galaxy is a large public repository of Ansible roles. Please use the following command to install this role on your Ansible Server.
+```
+ansible-galaxy install markantonygit.ansible_multipleos_lamp
+```
+Once the role is installed on your server, you can use this role on any of your playbooks. I have created a sample playbook to run this role and it is given below.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Example Playbook 
 
-Example Playbook
-----------------
+This playbook is just for checking the working of the role and to upload a sample index.php file to the virtual host document root. 
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```
+---
+- name: "Testing Ansible role"
+  hosts: all
+  become: true
+  roles:
+    - markantonygit.ansible_multipleos_lamp
+  tasks:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+    - name: "Uploading Sample Index File to RedHat Based Distributions"
+      when: ansible_os_family=="RedHat"
+      copy:
+        src: index.php
+        dest: "/var/www/html/{{  domain_name  }}/"
+        owner: "{{ httpd_user }}"
+        group: "{{ httpd_group }}"
 
-License
--------
+    - name: "Uploading Sample Index File to Debian Based Distributions"
+      when: ansible_os_family=="Debian"
+      copy:
+        src: index.php
+        dest: "/var/www/{{ domain_name }}/public_html/"
+        owner: "{{ ubuntu_user }}"
+        group: "{{ ubuntu_group }}"
+```
+##### Sample Index.php File
 
-BSD
+This index file displays the OS distribution of the server and the header Sample Website. 
+ 
+```
+<div style='text-align: center'><?php
+echo php_uname();
+echo "<h1><center>Sample Website</center></h1>"
+?></div>
+```
 
-Author Information
-------------------
+## Sample Screenshots
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+-- Sample Index Pages
+
+![](https://i.ibb.co/rdyhvZg/lamp1.jpg)
+![](https://i.ibb.co/hFCbL6j/lamp2.jpg)
+
+-- Play 
+
+![](https://i.ibb.co/gtSXGf0/lamp4.jpg)
+
+-- Play Output
+
+![](https://i.ibb.co/XbQcLms/lamp3.jpg)
+
+------------------------------------------ ------------------Mark Antony ------------------------------------------ 
+------------------------------------------ linkedin.com/in/mark-antony-345473211 -------------------------------------------------------------------------- markantony.alenchery@gmail.com ---------------------------------------------------------------------------
