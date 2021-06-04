@@ -1,0 +1,90 @@
+---
+- name: "Ubuntu - Updating all packages"
+  shell: "apt update -y"  
+
+- name: "Ubuntu - Installing apache2"
+  apt:
+    name: apache2
+    state: present
+  notify: "apache2-restart"
+
+- name: "Ubuntu - Installing PIP"
+  apt:
+    name: python-pip        
+
+- name: "Ubuntu - Installing MySQL Server and Extra Packages"
+  apt:
+    name:
+      - mysql-server
+      - python-dev
+      - libmysqlclient-dev
+    state: present
+
+- name: "Ubuntu - Updating PIP and Installing MySQL-Python"
+  shell: "pip install -U pip; pip install MySQL-python"
+
+  #- name: "Ubuntu - Installing MySQL-Python"
+  #pip:
+  # name: MySQL-python
+
+- name: "Ubuntu - Add Repository"
+  apt_repository:
+    repo: ppa:ondrej/php
+    state: present
+
+- name: "Ubuntu - Updating all packages"
+  apt:
+    name: "*"
+    state: latest    
+
+- name: "Ubuntu - Installing PHP7.4"
+  apt:
+    name: php7.4
+    state: present
+    
+- name: "Apache2 - Creating VirtualHost"
+  template:
+    src: ubuntu_virtualhost.conf.tmpl
+    dest: "/etc/apache2/sites-available/{{ domain_name }}.conf"
+  notify: "apache2-restart" 
+
+- name: "Apache - Creating VirtualHost DocumentRoot"
+  file:
+    path: "/var/www/{{ domain_name }}/public_html"
+    state: directory
+    owner: "{{ ubuntu_user }}"
+    group: "{{ ubuntu_group }}"
+  notify: "apache2-restart"
+
+- name: "Apache2 -Enable website"
+  shell: "a2ensite {{ domain_name }}.conf"
+  notify: "apache2-restart" 
+
+- name: "MySQL - restarting/enabling service"
+  service:
+    name: mysql
+    state: restarted
+    enabled: true
+
+- name: "MySQL Secure Installation - Update Root Password"
+  ignore_errors: true
+  mysql_user:
+    login_user: "root"
+    login_password: ""
+    user: "root"
+    password: "{{ mysql_root }}"
+    host_all: true
+
+- name: "MySQL Secure Installation - Removing Anonymous Users"
+  mysql_user:
+    login_user: "root"
+    login_password: "{{ mysql_root }}"
+    user: ""
+    state: absent
+
+- name: "MySQL Secure Installation - Removing Test Database"
+  mysql_db:
+    login_user: "root"
+    login_password: "{{ mysql_root }}"
+    name: "test"
+    state: absent

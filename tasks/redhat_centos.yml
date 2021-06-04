@@ -1,0 +1,100 @@
+---
+- name: "RedHat/Centos - Installing httpd"
+  yum:
+    name: httpd
+    state: present    
+  notify: apache-restart
+
+- name: "RedHat/Centos - Download EPEL RPM"
+  get_url:
+    url: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    dest: /root/
+
+- name: "RedHat/Centos - Installing EPEL"
+  yum:
+    name: /root/epel-release-latest-7.noarch.rpm
+    state: present
+
+- name: "RedHat/Centos - Download remi repo rpm"
+  get_url:
+    url: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+    dest: /root/
+
+- name: "RedHat/Centos - Installing Remi Repo"
+  yum:
+    name: /root/remi-release-7.rpm
+    state: present
+
+- name: "RedHat/Centos - Installing GlibC"
+  yum:
+    name: yum-utils
+    state: present
+
+- name: "RedHat/Centos - Updating all packages"
+  yum:
+    name: "*"
+    state: latest
+
+- name: "RedHat/Centos - Install PHP7.4"
+  yum:
+    enablerepo:
+      - remi
+      - remi-php74
+    name: php
+    state: present
+
+- name: "RedHat/Centos - Installing Mariadb"
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: present
+
+- name: "Apache - Creating Httpd Configuration File"
+  template:
+    src: httpd.conf.tmpl
+    dest: /etc/httpd/conf/httpd.conf
+  notify: apache-restart
+
+- name: "Apache - Creating VirtualHost"
+  template:
+    src: virtualhost.conf.tmpl
+    dest: "/etc/httpd/conf.d/{{ domain_name }}.conf"
+  notify: apache-restart
+
+- name: "Apache - Creating VirtualHost DocumentRoot"
+  file:
+    path: "/var/www/html/{{ domain_name }}"
+    state: directory
+    owner: "{{ httpd_user }}"
+    group: "{{ httpd_group }}"
+  notify: apache-restart
+
+- name: "Mariadb - restarting/enabling service"
+  service:
+    name: mariadb
+    state: restarted
+    enabled: true
+
+- name: "MySQL Secure Installation - Update Root Password"
+  ignore_errors: true
+  mysql_user:
+    login_user: "root"
+    login_password: ""
+    user: "root"
+    password: "{{ mysql_root }}"
+    host_all: true
+
+- name: "MySQL Secure Installation - Removing Anonymous Users"
+  mysql_user:
+    login_user: "root"
+    login_password: "{{ mysql_root }}"
+    user: ""
+    state: absent
+
+- name: "MySQL Secure Installation - Removing Test Database"
+  mysql_db:
+    login_user: "root"
+    login_password: "{{ mysql_root }}"
+    name: "test"
+    state: absent

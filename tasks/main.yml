@@ -1,0 +1,10 @@
+---
+
+- include: amazon_linux.yml
+  when: ansible_facts.distribution=="Amazon" 
+
+- include: redhat_centos.yml
+  when: ansible_facts.distribution=="CentOS" or ansible_facts.distribution=="RedHat" 
+
+- include: debian.yml
+  when: ansible_facts.distribution=="Ubuntu"  

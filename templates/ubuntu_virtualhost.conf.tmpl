@@ -1,0 +1,6 @@
+<VirtualHost *:{{ httpd_port }}>
+        ServerAdmin webmaster@localhost
+        ServerName {{ domain_name }}
+        ServerAlias www.{{ domain_name }}
+        DocumentRoot /var/www/{{ domain_name }}/public_html/
+</VirtualHost>

@@ -1,0 +1,65 @@
+---
+- name: "Amazon - Installing httpd"
+  yum:
+    name: httpd
+    state: present
+  notify: apache-restart
+
+- name: "Amazon - Installing Mariadb"
+  yum: 
+    name: 
+      - mariadb-server
+      - MySQL-python
+    state: present  
+
+- name: "Amazon - Installing PHP"
+  shell: "amazon-linux-extras install php7.4 -y"
+
+- name: "Apache - Creating Httpd Configuration File"
+  template:
+    src: httpd.conf.tmpl
+    dest: /etc/httpd/conf/httpd.conf
+  notify: apache-restart
+
+- name: "Apache - Creating VirtualHost"
+  template:
+    src: virtualhost.conf.tmpl
+    dest: "/etc/httpd/conf.d/{{ domain_name }}.conf"
+  notify: apache-restart
+
+- name: "Apache - Creating VirtualHost DocumentRoot"
+  file:
+    path: "/var/www/html/{{ domain_name }}"
+    state: directory
+    owner: "{{ httpd_user }}"
+    group: "{{ httpd_group }}"
+  notify: apache-restart  
+
+- name: "Mariadb - restarting/enabling service"
+  service:
+    name: mariadb
+    state: restarted
+    enabled: true
+
+- name: "MySQL Secure Installation - Update Root Password"
+  ignore_errors: true
+  mysql_user:
+    login_user: "root"
+    login_password: ""
+    user: "root"
+    password: "{{ mysql_root }}"
+    host_all: true
+
+- name: "MySQL Secure Installation - Removing Anonymous Users"
+  mysql_user:
+    login_user: "root"
+    login_password: "{{ mysql_root }}"
+    user: ""
+    state: absent
+
+- name: "MySQL Secure Installation - Removing Test Database"
+  mysql_db:
+    login_user: "root"
+    login_password: "{{ mysql_root }}"
+    name: "test"
+    state: absent

@@ -1,0 +1,13 @@
+---
+- name: "apache-restart"
+  service: 
+    name: httpd
+    state: restarted
+    enabled: true
+
+- name: "apache2-restart"
+  service:
+    name: apache2
+    state: restarted
+    enabled: true
+    

@@ -1,0 +1,8 @@
+---
+domain_name: "markdevops.xyz"
+httpd_group: "apache"
+httpd_user: "apache"
+ubuntu_user: "www-data"
+ubuntu_group: "www-data"
+httpd_port: "80"
+mysql_root: "myroot123"
