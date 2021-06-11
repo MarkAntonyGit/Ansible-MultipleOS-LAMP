@@ -78,9 +78,8 @@ echo "<h1><center>Sample Website</center></h1>"
 
 -- Play Output
 
-![](https://i.ibb.co/XbQcLms/lamp3.jpg)
+![](https://i.ibb.co/XbQcLms/lamp3.jpg)                                                
 
--------- Mark Antony ------------------------------------------------------------------------------------------------------------------------------- linkedin.com/in/mark-antony-345473211 ------------------------------------------------------------------------------------------------------- markantony.alenchery@gmail.com ----------------------------------------------------
+### Connect with me
 
-
-                                                        
+--------<img src="https://img.shields.io/badge/-Mark%20Antony-brightgreen"/> ----------------------------------------------------------------------------------------------------------------------------------- <a href="https://www.linkedin.com/in/profile-markantony/"><img src="https://img.shields.io/badge/-Linkedin%20Profile-blue"/></a> ------------------------------------------------------------------------------------------------------------------------------------ <a href="mailto:markantony.alenchery@gmail.com"><img src="https://img.shields.io/badge/-markantony.alenchery@gmail.com-D14836?style=flat&logo=Gmail&logoColor=white"/></a>-------------------------------------------------------
